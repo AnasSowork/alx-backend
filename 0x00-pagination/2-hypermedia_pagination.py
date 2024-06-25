@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Simple pagination sample.
+"""Hypermedia pagination sample.
 """
 import csv
-from typing import List, Tuple
+import math
+from typing import Dict, List, Tuple
 
 
 def index_range(page: int, page_size: int) -> Tuple[int, int]:
@@ -44,3 +45,19 @@ class Server:
         if start > len(data):
             return []
         return data[start:end]
+
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict:
+        """Retrieves information about a page.
+        """
+        page_data = self.get_page(page, page_size)
+        start, end = index_range(page, page_size)
+        total_pages = math.ceil(len(self.__dataset) / page_size)
+        page_info = {
+            'page_size': len(page_data),
+            'page': page,
+            'data': page_data,
+            'next_page': page + 1 if end < len(self.__dataset) else None,
+            'prev_page': page - 1 if start > 0 else None,
+            'total_pages': total_pages,
+        }
+        return page_info
